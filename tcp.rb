@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 
-Class Tcp
+requiere "socket"
 
+Class TCP
 def initialize
 
 end
