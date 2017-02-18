@@ -12,14 +12,13 @@ def post (url)
   http = NET::HTTP.new(url, 80)
   request = NET::HTTP::GET.new(url.request_uri)
 
-  req = add_signature_to_authorization.dup
-
   NET::HTTP.start(url.host, url.port) do |http|
-    http.request(req["auth_header"])
+    http.request(@header["auth_header"])
   end
 end
 
-# oauth_signatureは含まないAuthorizationヘッダを作成
+
+# oauth_signatureを含まないAuthorizationヘッダを作成
 def authorization_header (oauth_consumer_key, oauth_token, oauth_signature_method, oauth_timestamp, oauth_nonce)
   =begin
   $oauth_consumer_key
@@ -38,15 +37,15 @@ def authorization_header (oauth_consumer_key, oauth_token, oauth_signature_metho
   oauth_timestamp = "oauth_timestamp=\"" + url_encode(oauth_timestamp) + "\","
   oauth_nonce = "oauth_nonce=\"" + url_encode(oauth_nonce) + "\""
 
-  hash = {"auth_header" => auth_scheme + oauth_consumer_key + oauth_token + oauth_signature_method + oauth_timestamp + oauth_nonce}
+  @header = {"auth_header" => auth_scheme + oauth_consumer_key + oauth_token + oauth_signature_method + oauth_timestamp + oauth_nonce}
+
 end
 
 def add_signature_to_authorization (oauth_signature)
   oauth_signature = "oauth_signature=\"" + url_encode(oauth_signature) + "\""
 
-  header = authorization_header.dup
+  @header["auth_header"] = @header["auth_header"] + "," + oauth_signature
 
-  header["auth_header"] = header["auth_header"] + "," + oauth_signature
 end
 
 end
