@@ -12,7 +12,7 @@ def post (url)
   http = NET::HTTP.new(url, 80)
   request = NET::HTTP::GET.new(url.request_uri)
 
-  req = authorization_header.dup
+  req = add_signature_to_authorization.dup
 
   NET::HTTP.start(url.host, url.port) do |http|
     http.request(req["auth_header"])
@@ -46,8 +46,7 @@ def add_signature_to_authorization (oauth_signature)
 
   header = authorization_header.dup
 
-  header["auth_header"] = header["auth_header"] + oauth_signature
-
+  header["auth_header"] = header["auth_header"] + "," + oauth_signature
 end
 
 end
