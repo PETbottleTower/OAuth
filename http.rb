@@ -12,8 +12,10 @@ def post
   http = NET::HTTP.new($url, 80)
   request = NET::HTTP::GET.new(url.request_uri)
 
+  req = authorization_header.dup
+
   NET::HTTP.start(url.host, url.port) do |http|
-    http.request(@header)
+    http.request(req["auth_header"])
   end
 end
 
