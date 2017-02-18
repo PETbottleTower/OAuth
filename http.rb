@@ -4,19 +4,10 @@ require "erb"
 include ERB::Util
 
 Class HTTP
+@header = {}
+
 def initialize
 end
-
-def post (url)
-  url = URI.parse(url)
-  http = NET::HTTP.new(url, 80)
-  request = NET::HTTP::GET.new(url.request_uri)
-
-  NET::HTTP.start(url.host, url.port) do |http|
-    http.request(@header["auth_header"])
-  end
-end
-
 
 # oauth_signatureを含まないAuthorizationヘッダを作成
 def authorization_header (oauth_consumer_key, oauth_token, oauth_signature_method, oauth_timestamp, oauth_nonce)
@@ -38,14 +29,24 @@ def authorization_header (oauth_consumer_key, oauth_token, oauth_signature_metho
   oauth_nonce = "oauth_nonce=\"" + url_encode(oauth_nonce) + "\""
 
   @header = {"auth_header" => auth_scheme + oauth_consumer_key + oauth_token + oauth_signature_method + oauth_timestamp + oauth_nonce}
-
 end
 
+#signatureを計算した後にヘッダに追加
 def add_signature_to_authorization (oauth_signature)
   oauth_signature = "oauth_signature=\"" + url_encode(oauth_signature) + "\""
 
   @header["auth_header"] = @header["auth_header"] + "," + oauth_signature
+end
 
+#Authorizationヘッダを入れてGETを飛ばす
+def post (url)
+  url = URI.parse(url)
+  http = NET::HTTP.new(url, 80)
+  request = NET::HTTP::GET.new(url.request_uri)
+
+  NET::HTTP.start(url.host, url.port) do |http|
+    http.request(@header["auth_header"])
+  end
 end
 
 end
